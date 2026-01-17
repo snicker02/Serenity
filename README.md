@@ -1,5 +1,5 @@
 Serenity V1.0 Release Notes
-Download files from here https://github.com/snicker02/Serenity/releases/tag/v1.0
+Download files from [HERE] (https://github.com/snicker02/Serenity/releases/tag/v1.0)
 Release Date: January 16, 2026 Engine: Godot 4.x
 
 🚀 Initial Release
