@@ -8,11 +8,11 @@ Download files from [HERE](https://github.com/snicker02/Serenity/releases/tag/v1
 We are excited to introduce Serenity, a generative art tool designed for creating intricate patterns. This initial version focuses on providing a fluid workflow for drawing, editing, and layering complex geometric designs.
 
 ✨ Key Features
-Two Distinct Pattern Modes
+**Three Distinct Pattern Modes**
 
-Paradox Mode: Generates twisted, spiral-like patterns using recursive geometry. Perfect for creating depth and motion within a shape.
-
-Aura Mode: Automatically generates "echoing" lines around your primary shape. Includes smart geometry handling to prevent overlapping loops, ensuring clean, parallel lines.
+* **Paradox Mode:** Generates twisted, spiral-like patterns using recursive geometry. Perfect for creating depth and motion within a shape.
+* **Aura Mode:** Automatically generates "echoing" lines around your primary shape. Includes smart geometry handling to prevent overlapping loops.
+* **Cellular Aura Mode:** Generates organic, interconnected "cells" or bubbles with echoing internal lines.
 
 Live Editing & Parameters
 
