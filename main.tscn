@@ -1,0 +1,234 @@
+[gd_scene load_steps=8 format=3 uid="uid://b600wu6efm85f"]
+
+[ext_resource type="Script" uid="uid://dd7i440t0oymq" path="res://frozen_art.gd" id="1_h2yge"]
+[ext_resource type="Shader" uid="uid://dcfpdvk6hjfpu" path="res://generator.gdshader" id="2_1bvp3"]
+[ext_resource type="Script" uid="uid://d0wldgdv1qm0j" path="res://generator.gd" id="3_lquwl"]
+[ext_resource type="Script" uid="uid://b4ljslp4asra0" path="res://panel_container.gd" id="4_1bvp3"]
+[ext_resource type="Script" uid="uid://cgi3tr7w0s1fc" path="res://top_panel.gd" id="5_lquwl"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7mycd"]
+resource_local_to_scene = true
+shader = ExtResource("2_1bvp3")
+
+[sub_resource type="LabelSettings" id="LabelSettings_lquwl"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ExportDialog" type="FileDialog" parent="."]
+access = 2
+filters = PackedStringArray("*.png ; PNG Image")
+use_native_dialog = true
+
+[node name="MainLayout" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopPanel" type="Panel" parent="MainLayout" node_paths=PackedStringArray("sidebar", "background_rect", "file_dialog")]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource("5_lquwl")
+sidebar = NodePath("../Workspace/PanelContainer/VBoxContainer")
+background_rect = NodePath("../Workspace/ArtView/SubViewport/BackgroundRect")
+file_dialog = NodePath("../../ExportDialog")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MainLayout/TopPanel"]
+layout_mode = 0
+offset_right = 476.0
+offset_bottom = 31.0
+
+[node name="File_Actions2" type="Label" parent="MainLayout/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "Serenity V1.0"
+
+[node name="VSeparator3" type="VSeparator" parent="MainLayout/TopPanel/HBoxContainer"]
+layout_mode = 2
+
+[node name="File_Actions" type="Label" parent="MainLayout/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "File Actions"
+
+[node name="VSeparator" type="VSeparator" parent="MainLayout/TopPanel/HBoxContainer"]
+layout_mode = 2
+
+[node name="ExportButton" type="Button" parent="MainLayout/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "Save Image (PNG)"
+
+[node name="VSeparator2" type="VSeparator" parent="MainLayout/TopPanel/HBoxContainer"]
+layout_mode = 2
+
+[node name="TransparentCheck" type="CheckBox" parent="MainLayout/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "Transparent Background"
+
+[node name="Workspace" type="HBoxContainer" parent="MainLayout"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ArtView" type="SubViewportContainer" parent="MainLayout/Workspace"]
+layout_mode = 2
+size_flags_horizontal = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="MainLayout/Workspace/ArtView"]
+size = Vector2i(1001, 717)
+
+[node name="BackgroundRect" type="ColorRect" parent="MainLayout/Workspace/ArtView/SubViewport"]
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 4000.0
+offset_bottom = 4000.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.40069774, 0.40069774, 0.40069768, 1)
+
+[node name="FrozenArt" type="Node2D" parent="MainLayout/Workspace/ArtView/SubViewport"]
+script = ExtResource("1_h2yge")
+
+[node name="Generator" type="Node2D" parent="MainLayout/Workspace/ArtView/SubViewport"]
+material = SubResource("ShaderMaterial_7mycd")
+script = ExtResource("3_lquwl")
+
+[node name="MaskViewport" type="SubViewport" parent="MainLayout/Workspace/ArtView/SubViewport"]
+transparent_bg = true
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="MaskCanvas" type="Node2D" parent="MainLayout/Workspace/ArtView/SubViewport/MaskViewport"]
+
+[node name="PanelContainer" type="PanelContainer" parent="MainLayout/Workspace" node_paths=PackedStringArray("background_rect", "generator")]
+layout_mode = 2
+script = ExtResource("4_1bvp3")
+background_rect = NodePath("../ArtView/SubViewport/BackgroundRect")
+generator = NodePath("../ArtView/SubViewport/Generator")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainLayout/Workspace/PanelContainer"]
+layout_mode = 2
+mouse_filter = 0
+
+[node name="ClearButton" type="Button" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Clear Canvas"
+
+[node name="Label2" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Background Color"
+
+[node name="BGColorPicker" type="ColorPickerButton" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Background Color"
+
+[node name="Label" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Pen Color"
+
+[node name="ColorPicker" type="ColorPickerButton" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "ColorPicker"
+
+[node name="PatternSelect" type="OptionButton" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Line Width" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Line Width"
+
+[node name="WidthSlider" type="HSlider" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 0.1
+max_value = 20.0
+step = 0.1
+value = 2.1
+
+[node name="SpacingLabel" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Spacing"
+
+[node name="SpacingSlider" type="HSlider" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 5.0
+max_value = 50.0
+value = 15.0
+
+[node name="Count" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Count"
+
+[node name="CountSlider" type="HSlider" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 1.0
+max_value = 80.0
+value = 15.0
+
+[node name="Wobble" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Wobble"
+
+[node name="WobbleSlider" type="HSlider" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+max_value = 3.0
+step = 0.001
+
+[node name="StabilizerCheck" type="CheckBox" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Stabilize Ends"
+
+[node name="RoundCornersCheck" type="CheckBox" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Round Corners"
+
+[node name="TwistLabel" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Twist (Spiral)"
+
+[node name="TwistSlider" type="HSlider" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 0.01
+max_value = 0.4
+step = 0.01
+value = 0.09999999999999999
+
+[node name="BiasLabel" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Bias"
+
+[node name="BiasSlider" type="HSlider" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+max_value = 1.0
+step = 0.1
+value = 0.5
+
+[node name="BiasCheck" type="CheckBox" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Enable Bias\""
+
+[node name="RoundnessLabel" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Cell Roundness"
+
+[node name="RoundnessSlider" type="HSlider" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.5
+
+[node name="InstructionLabel" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+label_settings = SubResource("LabelSettings_lquwl")
+autowrap_mode = 3
