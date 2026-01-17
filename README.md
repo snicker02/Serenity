@@ -3,7 +3,7 @@ Download files from here https://github.com/snicker02/Serenity/releases/tag/v1.0
 Release Date: January 16, 2026 Engine: Godot 4.x
 
 🚀 Initial Release
-We are excited to introduce Serenity, a generative art tool designed for creating intricate, Zentangle-inspired patterns. This initial version focuses on providing a fluid workflow for drawing, editing, and layering complex geometric designs.
+We are excited to introduce Serenity, a generative art tool designed for creating intricate patterns. This initial version focuses on providing a fluid workflow for drawing, editing, and layering complex geometric designs.
 
 ✨ Key Features
 Two Distinct Pattern Modes
