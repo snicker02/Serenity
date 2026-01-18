@@ -1,5 +1,7 @@
 **Serenity V2.0 Release Notes**
+
 Download files from [HERE](https://github.com/snicker02/Serenity/releases/tag/v2.0)
+
 Open Web Version from [HERE](https://snicker02.github.io/Serenity/)
 
 Universal UI Scaling: Added a SpinBox to the Top Bar that resizes the entire interface (text and buttons) in real-time without breaking the layout.
@@ -12,6 +14,7 @@ Dynamic Labels: Sliders now display their exact values (including decimals for p
 
 Robust Exporting: The "Save Image" feature now cleanly hides all UI elements (including the new Bottom Panel) before capturing the art.
 
+==================================================================
 
 **Serenity V1.0 Release Notes**
 Download files from [HERE](https://github.com/snicker02/Serenity/releases/tag/v1.0)
