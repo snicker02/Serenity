@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://b600wu6efm85f"]
+[gd_scene load_steps=9 format=3 uid="uid://b600wu6efm85f"]
 
 [ext_resource type="Script" uid="uid://dd7i440t0oymq" path="res://frozen_art.gd" id="1_h2yge"]
 [ext_resource type="Shader" uid="uid://dcfpdvk6hjfpu" path="res://generator.gdshader" id="2_1bvp3"]
 [ext_resource type="Script" uid="uid://d0wldgdv1qm0j" path="res://generator.gd" id="3_lquwl"]
 [ext_resource type="Script" uid="uid://b4ljslp4asra0" path="res://panel_container.gd" id="4_1bvp3"]
 [ext_resource type="Script" uid="uid://cgi3tr7w0s1fc" path="res://top_panel.gd" id="5_lquwl"]
+[ext_resource type="Script" uid="uid://b8s6xin57o4kj" path="res://bottom_panel.gd" id="6_7mycd"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_7mycd"]
 resource_local_to_scene = true
@@ -35,7 +36,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TopPanel" type="Panel" parent="MainLayout" node_paths=PackedStringArray("sidebar", "background_rect", "file_dialog")]
+[node name="TopPanel" type="Panel" parent="MainLayout" node_paths=PackedStringArray("sidebar", "background_rect", "file_dialog", "art_viewport", "export_btn", "transparent_check", "scale_spin")]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 size_flags_horizontal = 0
@@ -44,11 +45,16 @@ script = ExtResource("5_lquwl")
 sidebar = NodePath("../Workspace/PanelContainer/VBoxContainer")
 background_rect = NodePath("../Workspace/ArtView/SubViewport/BackgroundRect")
 file_dialog = NodePath("../../ExportDialog")
+art_viewport = NodePath("../Workspace/ArtView/SubViewport")
+export_btn = NodePath("HBoxContainer/ExportButton")
+transparent_check = NodePath("HBoxContainer/TransparentCheck")
+scale_spin = NodePath("HBoxContainer/UIScaleSpin")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MainLayout/TopPanel"]
 layout_mode = 0
-offset_right = 476.0
-offset_bottom = 31.0
+offset_top = 26.5
+offset_right = 1070.0
+offset_bottom = 65.5
 
 [node name="File_Actions2" type="Label" parent="MainLayout/TopPanel/HBoxContainer"]
 layout_mode = 2
@@ -75,6 +81,16 @@ layout_mode = 2
 layout_mode = 2
 text = "Transparent Background"
 
+[node name="VSeparator4" type="VSeparator" parent="MainLayout/TopPanel/HBoxContainer"]
+layout_mode = 2
+
+[node name="UIScaleLabel" type="Label" parent="MainLayout/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "UI Size"
+
+[node name="UIScaleSpin" type="SpinBox" parent="MainLayout/TopPanel/HBoxContainer"]
+layout_mode = 2
+
 [node name="Workspace" type="HBoxContainer" parent="MainLayout"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -85,10 +101,12 @@ size_flags_horizontal = 3
 stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="MainLayout/Workspace/ArtView"]
+handle_input_locally = false
 size = Vector2i(1001, 717)
+render_target_update_mode = 4
 
 [node name="BackgroundRect" type="ColorRect" parent="MainLayout/Workspace/ArtView/SubViewport"]
-anchors_preset = -1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = 4000.0
@@ -111,11 +129,12 @@ render_target_update_mode = 4
 
 [node name="MaskCanvas" type="Node2D" parent="MainLayout/Workspace/ArtView/SubViewport/MaskViewport"]
 
-[node name="PanelContainer" type="PanelContainer" parent="MainLayout/Workspace" node_paths=PackedStringArray("background_rect", "generator")]
+[node name="PanelContainer" type="PanelContainer" parent="MainLayout/Workspace" node_paths=PackedStringArray("background_rect", "generator", "twist_label")]
 layout_mode = 2
 script = ExtResource("4_1bvp3")
 background_rect = NodePath("../ArtView/SubViewport/BackgroundRect")
 generator = NodePath("../ArtView/SubViewport/Generator")
+twist_label = NodePath("VBoxContainer/TwistLabel")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MainLayout/Workspace/PanelContainer"]
 layout_mode = 2
@@ -144,7 +163,7 @@ text = "ColorPicker"
 [node name="PatternSelect" type="OptionButton" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Line Width" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+[node name="WidthLabel" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Line Width"
 
@@ -152,7 +171,7 @@ text = "Line Width"
 layout_mode = 2
 min_value = 0.1
 max_value = 20.0
-step = 0.1
+step = 0.01
 value = 2.1
 
 [node name="SpacingLabel" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
@@ -163,9 +182,10 @@ text = "Spacing"
 layout_mode = 2
 min_value = 5.0
 max_value = 50.0
+step = 0.01
 value = 15.0
 
-[node name="Count" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+[node name="CountLabel" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Count"
 
@@ -175,7 +195,7 @@ min_value = 1.0
 max_value = 80.0
 value = 15.0
 
-[node name="Wobble" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
+[node name="WobbleLabel" type="Label" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Wobble"
 
@@ -232,3 +252,30 @@ custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 label_settings = SubResource("LabelSettings_lquwl")
 autowrap_mode = 3
+
+[node name="BottomPanel" type="PanelContainer" parent="MainLayout" node_paths=PackedStringArray("point_btn", "stop_btn", "commit_btn", "generator")]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+script = ExtResource("6_7mycd")
+point_btn = NodePath("HBoxContainer/PointButton")
+stop_btn = NodePath("HBoxContainer/StopButton")
+commit_btn = NodePath("HBoxContainer/CommitButton")
+generator = NodePath("../Workspace/ArtView/SubViewport/Generator")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MainLayout/BottomPanel"]
+layout_mode = 2
+
+[node name="PointButton" type="Button" parent="MainLayout/BottomPanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Place Point"
+
+[node name="StopButton" type="Button" parent="MainLayout/BottomPanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Stop/Edit"
+
+[node name="CommitButton" type="Button" parent="MainLayout/BottomPanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Commit (Freeze"

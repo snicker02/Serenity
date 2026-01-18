@@ -1,60 +1,92 @@
 extends Panel
 
-# --- DRAG AND DROP THESE IN THE INSPECTOR ---
+# --- DRAG AND DROP IN INSPECTOR ---
 @export var sidebar: Control
 @export var background_rect: ColorRect
 @export var file_dialog: FileDialog
+@export var art_viewport: SubViewport 
 
-# --- INTERNAL NODES (These are inside TopPanel, so paths are safe) ---
-@onready var export_btn = $HBoxContainer/ExportButton
-@onready var transparent_check = $HBoxContainer/TransparentCheck
+# --- UI BUTTONS ---
+@export var export_btn: Button        
+@export var transparent_check: Button
+# CHANGE: Now looking for a SpinBox
+@export var scale_spin: SpinBox 
 
 func _ready():
-	
-	
-	# --- NUCLEAR LAYOUT FIX ---
-	# This forces the panel to snap to the top and shrink to 60px height.
-	self.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	self.size.y = 60
-	self.position.y = 0
-	# Connect signals safely
 	if export_btn and not export_btn.pressed.is_connected(_on_export_pressed):
 		export_btn.pressed.connect(_on_export_pressed)
 
 	if file_dialog and not file_dialog.file_selected.is_connected(_on_file_saved):
 		file_dialog.file_selected.connect(_on_file_saved)
+			
+	# NEW SPINBOX CONNECTION
+	if scale_spin:
+		scale_spin.value = 16 
+		if not scale_spin.value_changed.is_connected(_on_scale_changed):
+			scale_spin.value_changed.connect(_on_scale_changed)
 
+# --- SIMPLE UPDATE FUNCTION ---
+func _on_scale_changed(value):
+	var new_size = int(value)
+	
+	# Update Top Bar
+	_force_update_fonts(self, new_size)
+	
+	# Update Sidebar
+	if sidebar:
+		_force_update_fonts(sidebar, new_size)
+
+# --- RECURSIVE UPDATER ---
+func _force_update_fonts(parent_node, size):
+	if parent_node is Control:
+		parent_node.add_theme_font_size_override("font_size", size)
+		if parent_node is Label and parent_node.label_settings:
+			parent_node.label_settings.font_size = size
+
+	for child in parent_node.get_children():
+		_force_update_fonts(child, size)
+
+# --- EXPORT LOGIC (Unchanged) ---
 func _on_export_pressed():
-	if file_dialog:
-		file_dialog.popup_centered()
+	if OS.has_feature("web"):
+		_export_for_web()
 	else:
-		print("ERROR: File Dialog is missing! Assign it in the Inspector.")
+		if file_dialog: file_dialog.popup_centered()
+
+func _export_for_web():
+	_prepare_capture_visuals()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if art_viewport:
+		var img = art_viewport.get_texture().get_image()
+		var buffer = img.save_png_to_buffer()
+		JavaScriptBridge.download_buffer(buffer, "serenity_art.png", "image/png")
+	_restore_capture_visuals()
 
 func _on_file_saved(path):
-	# 1. HIDE UI
-	self.visible = false
+	_prepare_capture_visuals()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if art_viewport:
+		var img = art_viewport.get_texture().get_image()
+		img.save_png(path)
+	_restore_capture_visuals()
+
+var _temp_bg_visible = true
+
+func _prepare_capture_visuals():
 	if sidebar: sidebar.visible = false
-	
-	# 2. HANDLE TRANSPARENCY
-	var original_bg_visible = true
+	self.visible = false 
 	if background_rect:
-		original_bg_visible = background_rect.visible
+		_temp_bg_visible = background_rect.visible
 		if transparent_check and transparent_check.button_pressed:
 			background_rect.visible = false
-			get_viewport().transparent_bg = true
-	
-	# 3. WAIT FOR DRAWING TO FINISH
-	await get_tree().process_frame
-	await get_tree().process_frame
-	
-	# 4. CAPTURE & SAVE
-	var img = get_viewport().get_texture().get_image()
-	img.save_png(path)
-	
-	# 5. RESTORE UI
-	self.visible = true
+			if art_viewport: art_viewport.transparent_bg = true
+
+func _restore_capture_visuals():
 	if sidebar: sidebar.visible = true
-	
+	self.visible = true
 	if background_rect:
-		background_rect.visible = original_bg_visible
-	get_viewport().transparent_bg = false
+		background_rect.visible = _temp_bg_visible
+	if art_viewport: 
+		art_viewport.transparent_bg = false

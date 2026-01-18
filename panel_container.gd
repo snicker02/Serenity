@@ -23,9 +23,12 @@ extends PanelContainer
 
 # LABELS
 @onready var spacing_label = $VBoxContainer.get_node_or_null("SpacingLabel")
-@onready var twist_label = $VBoxContainer.get_node_or_null("TwistLabel")
+@export var twist_label: Label
 @onready var bias_label = $VBoxContainer.get_node_or_null("BiasLabel")
 @onready var roundness_label = $VBoxContainer.get_node_or_null("RoundnessLabel")
+@onready var width_label = $VBoxContainer.get_node_or_null("WidthLabel")
+@onready var count_label = $VBoxContainer.get_node_or_null("CountLabel")
+@onready var wobble_label = $VBoxContainer.get_node_or_null("WobbleLabel")
 
 # OTHERS
 @onready var color_picker = $VBoxContainer/ColorPicker
@@ -92,6 +95,15 @@ func _ready():
 
 	# 4. INITIALIZE VISUALS
 	_on_pattern_selected(0)
+	
+	# Force labels to update on startup
+	if width_slider: _on_width_changed(width_slider.value)
+	if spacing_slider: _on_spacing_changed(spacing_slider.value)
+	if count_slider: _on_count_changed(count_slider.value)
+	if wobble_slider: _on_wobble_changed(wobble_slider.value)
+	if twist_slider: _on_twist_changed(twist_slider.value)
+	if bias_slider: _on_bias_changed(bias_slider.value)
+	if roundness_slider: _on_roundness_changed(roundness_slider.value)
 
 func _connect_slider(slider, var_name, func_ref):
 	if slider:
@@ -149,16 +161,47 @@ func _on_pattern_selected(index):
 		toggle_nodes.call(twist_controls, true)
 
 # --- SIGNAL FUNCTIONS ---
+
+
+func _on_width_changed(value): 
+	if generator: generator.line_width = value
+	if width_label: width_label.text = "Line Width: " + str(snapped(value, 0.01))
+
+func _on_spacing_changed(value): 
+	if generator: generator.spacing = value
+	if spacing_label: spacing_label.text = "Spacing: " + str(snapped(value, 0.01))
+
+func _on_count_changed(value): 
+	if generator: generator.count = int(value)
+	if count_label: count_label.text = "Count: " + str(value)
+
+func _on_wobble_changed(value): 
+	if generator: generator.wobble = value
+	if wobble_label: wobble_label.text = "Wobble: " + str(snapped(value, 0.1)) # Show 1 decimal
+
+func _on_twist_changed(value): 
+	# 1. Update the art
+	if generator and "twist" in generator: 
+		generator.twist = value
+	
+	# 2. Update the text (WITH DECIMALS)
+	if twist_label: 
+		# snapped(value, 0.01) turns 0.384 into 0.38
+		twist_label.text = "Twist: " + str(snapped(value, 0.01)) 
+	else:
+		print("ERROR: Twist Label is NOT connected in Inspector!")
+func _on_bias_changed(value): 
+	if generator and "spiral_bias" in generator: generator.spiral_bias = value
+	if bias_label: bias_label.text = "Bias: " + str(snapped(value, 0.01))
+
+func _on_roundness_changed(value):
+	if generator and "cell_roundness" in generator: generator.cell_roundness = value
+	if roundness_label: roundness_label.text = "Roundness: " + str(snapped(value, 0.1))
+
+# (Keep the color/clear functions as they were)
 func _on_color_changed(new_color): if generator: generator.line_color = new_color
 func _on_bg_color_changed(new_color): if background_rect: background_rect.color = new_color
-func _on_width_changed(value): if generator: generator.line_width = value
-func _on_spacing_changed(value): if generator: generator.spacing = value
-func _on_count_changed(value): if generator: generator.count = int(value)
-func _on_wobble_changed(value): if generator: generator.wobble = value
-func _on_twist_changed(value): if generator and "twist" in generator: generator.twist = value
-func _on_bias_changed(value): if generator and "spiral_bias" in generator: generator.spiral_bias = value
 func _on_bias_toggled(on): if generator and "use_bias" in generator: generator.use_bias = on
 func _on_stabilizer_toggled(on): if generator: generator.stabilize_ends = on
 func _on_round_corners_toggled(on): if generator: generator.smooth_joints = on
 func _on_clear_pressed(): if generator: generator.clear_all()
-func _on_roundness_changed(value): if generator and "cell_roundness" in generator: generator.cell_roundness = value
