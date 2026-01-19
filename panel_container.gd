@@ -1,7 +1,7 @@
 extends PanelContainer
 
 # --- EXPORT VARIABLES (These create the slots) ---
-@export var background_rect: ColorRect 
+@export var background_rect: ColorRect
 @export var generator: Node2D
 
 # --- UI NODES ---
@@ -14,7 +14,7 @@ extends PanelContainer
 @onready var wobble_slider = $VBoxContainer/WobbleSlider
 
 # PARADOX CONTROLS
-@onready var twist_slider = $VBoxContainer.get_node_or_null("TwistSlider") 
+@onready var twist_slider = $VBoxContainer.get_node_or_null("TwistSlider")
 @onready var bias_slider = $VBoxContainer.get_node_or_null("BiasSlider")
 @onready var bias_check = $VBoxContainer.get_node_or_null("BiasCheck")
 
@@ -37,12 +37,15 @@ extends PanelContainer
 @onready var clear_button = $VBoxContainer/ClearButton
 @onready var round_corners_check = $VBoxContainer/RoundCornersCheck 
 @onready var instruction_label = $VBoxContainer.get_node_or_null("InstructionLabel")
+@export var smooth_check: CheckBox
+@export var stabilize_check: CheckBox
+
 func _ready():
 	# 1. SETUP BACKGROUND
 	if background_rect:
 		background_rect.size = Vector2(10000, 10000)
 		background_rect.position = Vector2(-5000, -5000)
-		background_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE 
+		background_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		if bg_color_picker: bg_color_picker.color = background_rect.color
 
 	# 2. SETUP PATTERN SELECTOR
@@ -51,6 +54,9 @@ func _ready():
 		pattern_select.add_item("Aura (Ripple)")
 		pattern_select.add_item("Paradox (Spiral)")
 		pattern_select.add_item("Cellular Aura")
+		pattern_select.add_item("Flower")
+		pattern_select.add_item("Current")
+		pattern_select.add_item("Orbit")
 		if !pattern_select.item_selected.is_connected(_on_pattern_selected):
 			pattern_select.item_selected.connect(_on_pattern_selected)
 
@@ -113,57 +119,111 @@ func _connect_slider(slider, var_name, func_ref):
 
 # --- VISIBILITY LOGIC ---
 func _on_pattern_selected(index):
-	if generator: generator.pattern_mode = index
-	
-	# --- UPDATE INSTRUCTIONS ---
-	if instruction_label:
-		if index == 0: # AURA
-			instruction_label.text = "Left click to place/move points.\nRight click for edit preview.\nSpacebar to commit."
-		elif index == 1: # PARADOX
-			instruction_label.text = "Left click to place/move points.\nRight click for edit preview.\nSpacebar to commit."
-		elif index == 2: # CELLULAR
-			instruction_label.text = "Left click to place/move points.\nRight click for edit preview.\nSpacebar to commit."
-	
-	# --- VISIBILITY TOGGLES (Existing Logic) ---
-	var toggle_nodes = func(nodes, show_it):
-		for node in nodes: if node: node.visible = show_it
+	if generator:
+		generator.pattern_mode = index
+		generator.is_live_editing = false
+		generator.control_points.clear()
+		generator.queue_redraw()
 
-	var aura_only = [stabilizer_check]
-	var paradox_only = [bias_slider, bias_label, bias_check]
-	var cellular_only = [roundness_slider, roundness_label]
+	# --- SAFE UI VISIBILITY & DEFAULTS ---
 	
-	var twist_controls = [twist_slider, twist_label]
-	var shared_corners = [round_corners_check] 
-	var spacing_controls = [spacing_slider, spacing_label] 
-
-	if index == 0: # AURA
-		toggle_nodes.call(aura_only, true)
-		toggle_nodes.call(spacing_controls, true)
-		toggle_nodes.call(shared_corners, true)
-		toggle_nodes.call(paradox_only, false)
-		toggle_nodes.call(cellular_only, false)
-		toggle_nodes.call(twist_controls, false)
+	# 1. PARADOX (Mode 1)
+	if index == 1:
+		if twist_slider: twist_slider.visible = true
+		if twist_label: twist_label.visible = true
 		
-	elif index == 1: # PARADOX
-		toggle_nodes.call(aura_only, false)
-		toggle_nodes.call(spacing_controls, false)
-		toggle_nodes.call(shared_corners, false)
-		toggle_nodes.call(paradox_only, true)
-		toggle_nodes.call(cellular_only, false)
-		toggle_nodes.call(twist_controls, true)
+		if bias_slider: bias_slider.visible = true
+		if bias_label: bias_label.visible = true
+		if bias_check: bias_check.visible = true
 		
-	elif index == 2: # CELLULAR
-		toggle_nodes.call(aura_only, false)
-		toggle_nodes.call(spacing_controls, true)
-		toggle_nodes.call(paradox_only, false)
-		toggle_nodes.call(cellular_only, true)
-		toggle_nodes.call(shared_corners, true)
-		toggle_nodes.call(twist_controls, true)
+		if roundness_slider: roundness_slider.visible = false
+		if roundness_label: roundness_label.visible = false
+		
+	# 2. CELLULAR (Mode 2)
+	elif index == 2:
+		if twist_slider: twist_slider.visible = false
+		if twist_label: twist_label.visible = false
+		
+		if bias_slider: bias_slider.visible = false
+		if bias_label: bias_label.visible = false
+		if bias_check: bias_check.visible = false
+		
+		if roundness_slider: roundness_slider.visible = true
+		if roundness_label: roundness_label.visible = true
+		
+	# 3. FLOWER (Mode 3)
+	elif index == 3:
+		# VISIBILITY
+		if twist_slider: twist_slider.visible = true
+		if twist_label: twist_label.visible = true
+		
+		if roundness_slider: roundness_slider.visible = true
+		if roundness_label: roundness_label.visible = true
+		
+		if bias_slider: bias_slider.visible = false
+		if bias_label: bias_label.visible = false
+		if bias_check: bias_check.visible = false
+		
+		# --- FORCE DEFAULTS ---
+		if generator:
+			generator.smooth_joints = false 
+			generator.stabilize_ends = false
+			generator.queue_redraw()
+			
+			if smooth_check: smooth_check.set_pressed_no_signal(false)
+			if stabilize_check: stabilize_check.set_pressed_no_signal(false)
+	
+	# 4. CURRENT (Mode 4) -- FIXED SECTION
+	elif index == 4:
+		# We manually set visibility here instead of using the broken helper function
+		if twist_slider: twist_slider.visible = true
+		if twist_label: twist_label.visible = true
 
+		if roundness_slider: roundness_slider.visible = false
+		if roundness_label: roundness_label.visible = false
+
+		if bias_slider: bias_slider.visible = false
+		if bias_label: bias_label.visible = false
+		if bias_check: bias_check.visible = false
+		
+		if generator:
+			generator.queue_redraw()
+	
+	# 5. ORBIT (Mode 5)
+	elif index ==5:
+		# VISIBILITY
+		if twist_slider: twist_slider.visible = true # Ratio
+		if twist_label: twist_label.visible = true
+		
+		if wobble_slider: wobble_slider.visible = true # Loop Size
+		if wobble_label: wobble_label.visible = true
+		
+		if roundness_slider: roundness_slider.visible = false
+		if roundness_label: roundness_label.visible = false
+		
+		if bias_slider: bias_slider.visible = false
+		if bias_label: bias_label.visible = false
+		if bias_check: bias_check.visible = false
+		
+		if generator: generator.queue_redraw()
+	
+	# 0. AURA (Mode 0)
+	else:
+		if twist_slider: twist_slider.visible = false
+		if twist_label: twist_label.visible = false
+		
+		if bias_slider: bias_slider.visible = false
+		if bias_label: bias_label.visible = false
+		if bias_check: bias_check.visible = false
+		
+		if roundness_slider: roundness_slider.visible = false
+		if roundness_label: roundness_label.visible = false
+		
+		
 # --- SIGNAL FUNCTIONS ---
 
 
-func _on_width_changed(value): 
+func _on_width_changed(value):
 	if generator: generator.line_width = value
 	if width_label: width_label.text = "Line Width: " + str(snapped(value, 0.01))
 

@@ -56,9 +56,9 @@ offset_top = 26.5
 offset_right = 1070.0
 offset_bottom = 65.5
 
-[node name="File_Actions2" type="Label" parent="MainLayout/TopPanel/HBoxContainer"]
+[node name="Program version" type="Label" parent="MainLayout/TopPanel/HBoxContainer"]
 layout_mode = 2
-text = "Serenity V1.0"
+text = "Serenity V3.0"
 
 [node name="VSeparator3" type="VSeparator" parent="MainLayout/TopPanel/HBoxContainer"]
 layout_mode = 2
@@ -90,6 +90,7 @@ text = "UI Size"
 
 [node name="UIScaleSpin" type="SpinBox" parent="MainLayout/TopPanel/HBoxContainer"]
 layout_mode = 2
+value = 25.0
 
 [node name="Workspace" type="HBoxContainer" parent="MainLayout"]
 layout_mode = 2
@@ -129,12 +130,15 @@ render_target_update_mode = 4
 
 [node name="MaskCanvas" type="Node2D" parent="MainLayout/Workspace/ArtView/SubViewport/MaskViewport"]
 
-[node name="PanelContainer" type="PanelContainer" parent="MainLayout/Workspace" node_paths=PackedStringArray("background_rect", "generator", "twist_label")]
+[node name="PanelContainer" type="PanelContainer" parent="MainLayout/Workspace" node_paths=PackedStringArray("background_rect", "generator", "twist_label", "smooth_check", "stabilize_check")]
 layout_mode = 2
+mouse_filter = 2
 script = ExtResource("4_1bvp3")
 background_rect = NodePath("../ArtView/SubViewport/BackgroundRect")
 generator = NodePath("../ArtView/SubViewport/Generator")
 twist_label = NodePath("VBoxContainer/TwistLabel")
+smooth_check = NodePath("VBoxContainer/RoundCornersCheck")
+stabilize_check = NodePath("VBoxContainer/StabilizerCheck")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MainLayout/Workspace/PanelContainer"]
 layout_mode = 2
@@ -180,7 +184,7 @@ text = "Spacing"
 
 [node name="SpacingSlider" type="HSlider" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
 layout_mode = 2
-min_value = 5.0
+min_value = 0.5
 max_value = 50.0
 step = 0.01
 value = 15.0
@@ -219,7 +223,7 @@ text = "Twist (Spiral)"
 [node name="TwistSlider" type="HSlider" parent="MainLayout/Workspace/PanelContainer/VBoxContainer"]
 layout_mode = 2
 min_value = 0.01
-max_value = 0.4
+max_value = 5.0
 step = 0.01
 value = 0.09999999999999999
 
